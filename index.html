@@ -1,0 +1,314 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#102B50">
+<title>GuruCraft Academy</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;font-family:Arial,sans-serif;
+ background:#f3f5f9;color:#172b46;
+}
+header{
+ background:#102B50;color:white;
+ padding:25px 20px;text-align:center;
+}
+.logo{font-size:27px;font-weight:bold}
+.tagline{color:#e8c77a;font-size:11px;letter-spacing:2px}
+main{max-width:480px;margin:25px auto;padding:15px}
+.card{
+ background:white;border-radius:16px;padding:24px;
+ box-shadow:0 5px 22px #172b4612;
+}
+h2{margin-top:0}
+input,select{
+ width:100%;padding:14px;margin:8px 0 15px;
+ border:1px solid #dce2eb;border-radius:9px;
+ font-size:15px;background:white;
+}
+button{
+ width:100%;padding:14px;border:0;
+ border-radius:9px;background:#d5ad5d;
+ color:#102b50;font-weight:bold;font-size:16px;
+ margin-top:10px;cursor:pointer;
+}
+.secondary{background:#102b50;color:white}
+.link{
+ color:#174d86;text-align:center;
+ display:block;margin:17px 0;cursor:pointer;
+}
+.hidden{display:none}
+.message{font-size:14px;margin:12px 0;color:#b42318}
+.success{color:#16834a}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{
+ background:#f1f4f8;padding:18px;
+ border-radius:12px;min-height:95px;
+}
+.tile strong{display:block;margin-bottom:8px}
+.welcome{margin-bottom:20px}
+footer{text-align:center;color:#778398;font-size:12px;padding:25px}
+</style>
+</head>
+
+<body>
+
+<header>
+ <div class="logo">GuruCraft Academy</div>
+ <div class="tagline">YOUR POTENTIAL, OUR CRAFT.</div>
+</header>
+
+<main>
+
+<section id="authSection" class="card">
+ <div id="loginForm">
+  <h2>Welcome Back!</h2>
+  <p>Login to continue your learning journey.</p>
+
+  <label>Email Address</label>
+  <input id="loginEmail" type="email" placeholder="Enter your email">
+
+  <label>Password</label>
+  <input id="loginPassword" type="password" placeholder="Enter password">
+
+  <button id="loginBtn">LOGIN</button>
+  <span class="link" id="forgotBtn">Forgot Password?</span>
+  <span class="link" id="showRegister">New student? Create an account</span>
+ </div>
+
+ <div id="registerForm" class="hidden">
+  <h2>Student Registration</h2>
+  <p>Create your GuruCraft Academy account.</p>
+
+  <label>Full Name</label>
+  <input id="studentName" type="text" placeholder="Enter full name">
+
+  <label>Email Address</label>
+  <input id="registerEmail" type="email" placeholder="Enter email">
+
+  <label>Class / Course</label>
+  <select id="studentClass">
+   <option value="">Select your class</option>
+   <option>Class 6</option>
+   <option>Class 7</option>
+   <option>Class 8</option>
+   <option>Class 9</option>
+   <option>Class 10</option>
+   <option>Class 11</option>
+   <option>Class 12</option>
+   <option>JEE</option>
+   <option>GUJCET</option>
+  </select>
+
+  <label>Create Password</label>
+  <input id="registerPassword" type="password" placeholder="Minimum 6 characters">
+
+  <button id="registerBtn">CREATE ACCOUNT</button>
+  <span class="link" id="showLogin">Already registered? Login</span>
+ </div>
+
+ <div id="message" class="message" role="status"></div>
+</section>
+
+<section id="dashboard" class="hidden">
+ <div class="card">
+  <div class="welcome">
+   <h2 id="studentWelcome">Welcome!</h2>
+   <p id="studentInfo"></p>
+  </div>
+
+  <h3>My Learning Dashboard</h3>
+
+  <div class="grid">
+   <div class="tile"><strong>📚 My Courses</strong><small>View enrolled courses</small></div>
+   <div class="tile"><strong>🎥 Live Classes</strong><small>Upcoming lectures</small></div>
+   <div class="tile"><strong>▶ Recorded Lectures</strong><small>Watch lessons</small></div>
+   <div class="tile"><strong>📄 Study Materials</strong><small>Notes and worksheets</small></div>
+   <div class="tile"><strong>📝 Online Tests</strong><small>Practice and assessment</small></div>
+   <div class="tile"><strong>📊 My Results</strong><small>Performance reports</small></div>
+  </div>
+
+  <button id="logoutBtn" class="secondary">LOGOUT</button>
+ </div>
+</section>
+
+</main>
+
+<footer>© GuruCraft Academy. All rights reserved.</footer>
+
+<script type="module">
+import { initializeApp }
+ from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+
+import {
+ getAuth,
+ createUserWithEmailAndPassword,
+ signInWithEmailAndPassword,
+ sendPasswordResetEmail,
+ onAuthStateChanged,
+ signOut
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+import {
+ getFirestore,
+ doc,
+ setDoc,
+ getDoc,
+ serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+const firebaseConfig = {
+ apiKey: "AIzaSyC69JWSDRaMrLmLsRpq8SxPb2VTHSfhnb4",
+ authDomain: "gurucraft-academy.firebaseapp.com",
+ projectId: "gurucraft-academy",
+ storageBucket: "gurucraft-academy.firebasestorage.app",
+ messagingSenderId: "1052739777565",
+ appId: "1:1052739777565:web:3da99da79d360c9cedc2f4",
+ measurementId: "G-KG7WCYRSYE"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const $ = id => document.getElementById(id);
+
+function showMessage(text, success=false) {
+ $("message").textContent = text;
+ $("message").className = success
+  ? "message success" : "message";
+}
+
+function showLoginForm() {
+ $("loginForm").classList.remove("hidden");
+ $("registerForm").classList.add("hidden");
+ $("message").textContent = "";
+}
+
+function showRegisterForm() {
+ $("loginForm").classList.add("hidden");
+ $("registerForm").classList.remove("hidden");
+ $("message").textContent = "";
+}
+
+$("showRegister").onclick = showRegisterForm;
+$("showLogin").onclick = showLoginForm;
+
+$("registerBtn").onclick = async () => {
+ const name = $("studentName").value.trim();
+ const email = $("registerEmail").value.trim();
+ const studentClass = $("studentClass").value;
+ const password = $("registerPassword").value;
+
+ if (!name || !email || !studentClass || !password) {
+  showMessage("Please complete all fields.");
+  return;
+ }
+
+ if (password.length < 6) {
+  showMessage("Password must contain at least 6 characters.");
+  return;
+ }
+
+ $("registerBtn").disabled = true;
+ $("registerBtn").textContent = "CREATING ACCOUNT...";
+
+ try {
+  const result = await createUserWithEmailAndPassword(
+   auth,email,password
+  );
+
+  await setDoc(doc(db,"students",result.user.uid), {
+   name,
+   email: result.user.email,
+   class: studentClass,
+   role: "student",
+   createdAt: serverTimestamp()
+  });
+
+ } catch(error) {
+  showMessage(error.message);
+ } finally {
+  $("registerBtn").disabled = false;
+  $("registerBtn").textContent = "CREATE ACCOUNT";
+ }
+};
+
+$("loginBtn").onclick = async () => {
+ const email = $("loginEmail").value.trim();
+ const password = $("loginPassword").value;
+
+ if (!email || !password) {
+  showMessage("Enter your email and password.");
+  return;
+ }
+
+ $("loginBtn").disabled = true;
+ $("loginBtn").textContent = "LOGGING IN...";
+
+ try {
+  await signInWithEmailAndPassword(auth,email,password);
+ } catch(error) {
+  showMessage(error.message);
+ } finally {
+  $("loginBtn").disabled = false;
+  $("loginBtn").textContent = "LOGIN";
+ }
+};
+
+$("forgotBtn").onclick = async () => {
+ const email = $("loginEmail").value.trim();
+
+ if (!email) {
+  showMessage("Enter your registered email first.");
+  return;
+ }
+
+ try {
+  await sendPasswordResetEmail(auth,email);
+  showMessage("Password reset email sent. Check your inbox.",true);
+ } catch(error) {
+  showMessage(error.message);
+ }
+};
+
+$("logoutBtn").onclick = () => signOut(auth);
+
+onAuthStateChanged(auth, async user => {
+ if (!user) {
+  $("authSection").classList.remove("hidden");
+  $("dashboard").classList.add("hidden");
+  return;
+ }
+
+ try {
+  const profile = await getDoc(doc(db,"students",user.uid));
+
+  if (!profile.exists() || profile.data().role !== "student") {
+   await signOut(auth);
+   showLoginForm();
+   showMessage("Student profile not found. Please contact the academy.");
+   return;
+  }
+
+  const data = profile.data();
+
+  $("studentWelcome").textContent = "Welcome, " + data.name + "!";
+  $("studentInfo").textContent =
+   data.class + " | " + data.email;
+
+  $("authSection").classList.add("hidden");
+  $("dashboard").classList.remove("hidden");
+
+ } catch(error) {
+  showMessage(error.message);
+ }
+});
+</script>
+
+</body>
+</html>
