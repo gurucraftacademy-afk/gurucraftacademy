@@ -1,13 +1,14 @@
 
-const CACHE_NAME = "gurucraft-academy-v1";
-
+const CACHE_NAME = "gurucraft-academy-v2";
+const APP_FILES = [
 const APP_FILES = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./icon.svg"
+  "./icon.svg",
+  "./gurucraft-icon-192.png",
+  "./gurucraft-icon-512.png"
 ];
-
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
