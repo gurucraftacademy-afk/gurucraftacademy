@@ -140,6 +140,57 @@ footer{text-align:center;color:#778398;font-size:12px;padding:25px}
   <button id="logoutBtn" class="secondary">LOGOUT</button>
  </div>
 </section>
+ <section id="adminDashboard" class="hidden">
+
+  <div class="card">
+    <div class="welcome">
+      <h2 id="adminWelcome">Welcome, Admin!</h2>
+      <p id="adminInfo">GuruCraft Academy Administration</p>
+    </div>
+  </div>
+
+  <h3>Admin Control Panel</h3>
+
+  <div class="grid">
+    <div class="tile">
+      <strong>👨‍🎓 Manage Students</strong>
+      <small>View and manage student accounts</small>
+    </div>
+
+    <div class="tile">
+      <strong>📚 Manage Courses</strong>
+      <small>Create and manage courses</small>
+    </div>
+
+    <div class="tile">
+      <strong>🎥 Recorded Lectures</strong>
+      <small>Manage recorded classes</small>
+    </div>
+
+    <div class="tile">
+      <strong>📂 Study Materials</strong>
+      <small>Upload notes and worksheets</small>
+    </div>
+
+    <div class="tile">
+      <strong>📅 Live Classes</strong>
+      <small>Schedule online classes</small>
+    </div>
+
+    <div class="tile">
+      <strong>📝 Online Tests</strong>
+      <small>Create tests and assessments</small>
+    </div>
+
+    <div class="tile">
+      <strong>📊 Results & Reports</strong>
+      <small>Monitor student performance</small>
+    </div>
+  </div>
+
+  <button id="adminLogoutBtn" class="secondary">LOGOUT</button>
+
+</section>
 
 </main>
 
@@ -282,36 +333,65 @@ $("forgotBtn").onclick = async () => {
 };
 
 $("logoutBtn").onclick = () => signOut(auth);
-
+$("adminLogoutBtn").onclick = () => signOut(auth);
 onAuthStateChanged(auth, async user => {
- if (!user) {
-  $("authSection").classList.remove("hidden");
+  $("adminDashboard").classList.add("hidden");
   $("dashboard").classList.add("hidden");
-  return;
- }
 
- try {
-  const profile = await getDoc(doc(db,"students",user.uid));
-
-  if (!profile.exists() || profile.data().role !== "student") {
-   await signOut(auth);
-   showLoginForm();
-   showMessage("Student profile not found. Please contact the academy.");
-   return;
+  if (!user) {
+    $("authSection").classList.remove("hidden");
+    return;
   }
 
-  const data = profile.data();
+  try {
+    const profile = await getDoc(
+      doc(db, "students", user.uid)
+    );
 
-  $("studentWelcome").textContent = "Welcome, " + data.name + "!";
-  $("studentInfo").textContent =
-   data.class + " | " + data.email;
+    if (!profile.exists()) {
+      await signOut(auth);
+      showLoginForm();
+      showMessage("User profile not found. Contact the academy.");
+      return;
+    }
 
-  $("authSection").classList.add("hidden");
-  $("dashboard").classList.remove("hidden");
+    const data = profile.data();
 
- } catch(error) {
-  showMessage(error.message);
- }
+    // ADMIN LOGIN
+    if (data.role === "admin") {
+      $("adminWelcome").textContent =
+        "Welcome, " + (data.name || "Admin") + "!";
+
+      $("adminInfo").textContent =
+        "GuruCraft Academy Administration | " + data.email;
+
+      $("authSection").classList.add("hidden");
+      $("dashboard").classList.add("hidden");
+      $("adminDashboard").classList.remove("hidden");
+      return;
+    }
+
+    // STUDENT LOGIN
+    if (data.role === "student") {
+      $("studentWelcome").textContent =
+        "Welcome, " + data.name + "!";
+
+      $("studentInfo").textContent =
+        data.class + " | " + data.email;
+
+      $("authSection").classList.add("hidden");
+      $("adminDashboard").classList.add("hidden");
+      $("dashboard").classList.remove("hidden");
+      return;
+    }
+
+    await signOut(auth);
+    showLoginForm();
+    showMessage("Invalid account role. Contact the academy.");
+
+  } catch (error) {
+    showMessage(error.message);
+  }
 });
 </script>
 
