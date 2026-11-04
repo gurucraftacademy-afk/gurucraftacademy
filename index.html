@@ -212,6 +212,59 @@ footer{text-align:center;color:#778398;font-size:12px;padding:25px}
   </button>
 
 </div>
+  <div id="courseManagementPanel" class="card hidden">
+
+  <h3>📚 Manage Courses</h3>
+
+  <p>Create and manage academy courses.</p>
+
+  <input
+    type="text"
+    id="courseName"
+    placeholder="Course Name"
+  >
+
+  <select id="courseClass">
+    <option value="">Select Class</option>
+    <option>Class 6</option>
+    <option>Class 7</option>
+    <option>Class 8</option>
+    <option>Class 9</option>
+    <option>Class 10</option>
+    <option>Class 11</option>
+    <option>Class 12</option>
+  </select>
+
+  <input
+    type="text"
+    id="courseSubject"
+    placeholder="Subject"
+  >
+
+  <textarea
+    id="courseDescription"
+    placeholder="Course Description"
+  ></textarea>
+
+  <button type="button" id="addCourseBtn">
+    ADD COURSE
+  </button>
+
+  <h3>Available Courses</h3>
+
+  <div id="coursesList">
+    No courses added yet.
+  </div>
+
+  <button
+    type="button"
+    class="secondary"
+    id="closeCoursesBtn"
+  >
+    CLOSE
+  </button>
+
+</div>
   <button id="adminLogoutBtn" class="secondary">LOGOUT</button>
 
 </section>
