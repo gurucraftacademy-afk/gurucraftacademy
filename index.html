@@ -234,13 +234,14 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
 import {
- getFirestore,
- doc,
- setDoc,
- getDoc,
- serverTimestamp
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  getDocs,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
-
 const firebaseConfig = {
  apiKey: "AIzaSyC69JWSDRaMrLmLsRpq8SxPb2VTHSfhnb4",
  authDomain: "gurucraft-academy.firebaseapp.com",
