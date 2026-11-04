@@ -393,6 +393,86 @@ function renderStudents() {
 
 $("manageStudentsTile").onclick = openStudentManagementPanel;
 
+// MANAGE COURSES
+
+async function loadCourses() {
+  const list = $("coursesList");
+  list.textContent = "Loading courses...";
+
+  try {
+    const snapshot = await getDocs(collection(db, "courses"));
+    list.replaceChildren();
+
+    if (snapshot.empty) {
+      list.textContent = "No courses added yet.";
+      return;
+    }
+
+    snapshot.forEach((courseDoc) => {
+      const course = courseDoc.data();
+      const item = document.createElement("div");
+      item.className = "tile";
+
+      const title = document.createElement("strong");
+      title.textContent = course.name || "Untitled Course";
+
+      const details = document.createElement("small");
+      details.textContent =
+        (course.class || "") + " | " +
+        (course.subject || "");
+
+      item.appendChild(title);
+      item.appendChild(document.createElement("br"));
+      item.appendChild(details);
+      list.appendChild(item);
+    });
+  } catch (error) {
+    list.textContent = "Error: " + error.message;
+  }
+}
+
+$("manageCoursesTile").onclick = async () => {
+  $("courseManagementPanel").classList.remove("hidden");
+  await loadCourses();
+};
+
+$("closeCoursesBtn").onclick = () => {
+  $("courseManagementPanel").classList.add("hidden");
+};
+
+$("addCourseBtn").onclick = async () => {
+  const name = $("courseName").value.trim();
+  const courseClass = $("courseClass").value;
+  const subject = $("courseSubject").value.trim();
+  const description = $("courseDescription").value.trim();
+
+  if (!name || !courseClass || !subject) {
+    alert("Please enter course name, class and subject.");
+    return;
+  }
+
+  try {
+    await setDoc(doc(collection(db, "courses")), {
+      name: name,
+      class: courseClass,
+      subject: subject,
+      description: description,
+      createdAt: serverTimestamp()
+    });
+
+    alert("Course added successfully!");
+
+    $("courseName").value = "";
+    $("courseClass").value = "";
+    $("courseSubject").value = "";
+    $("courseDescription").value = "";
+
+    await loadCourses();
+  } catch (error) {
+    alert("Unable to add course: " + error.message);
+  }
+};
+
 $("studentSearch").oninput = renderStudents;
 
 $("closeStudentsBtn").onclick = () => {
