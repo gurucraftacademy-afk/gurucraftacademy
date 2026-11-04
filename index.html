@@ -640,17 +640,24 @@ onAuthStateChanged(auth, async user => {
   }
 
   try {
-    const profile = await getDoc(
+    let profile = await getDoc(
       doc(db, "students", user.uid)
     );
 
-    if (!profile.exists()) {
-      await signOut(auth);
-      showLoginForm();
-      showMessage("User profile not found. Contact the academy.");
-      return;
-    }
+   if (!profile.exists()) {
+  await new Promise(resolve => setTimeout(resolve, 2000));
 
+  profile = await getDoc(
+    doc(db, "students", user.uid)
+  );
+
+  if (!profile.exists()) {
+    await signOut(auth);
+    showLoginForm();
+    showMessage("User profile not found. Contact the academy.");
+    return;
+  }
+}
     const data = profile.data();
 
     // ADMIN LOGIN
