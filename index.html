@@ -187,7 +187,31 @@ footer{text-align:center;color:#778398;font-size:12px;padding:25px}
       <small>Monitor student performance</small>
     </div>
   </div>
+<div id="studentManagementPanel" class="card hidden">
 
+  <h3>👨‍🎓 Manage Students</h3>
+
+  <p>View and manage registered student accounts.</p>
+
+  <input
+    type="text"
+    id="studentSearch"
+    placeholder="Search by student name or email"
+  >
+
+  <div id="studentsList">
+    Loading students...
+  </div>
+
+  <button
+    type="button"
+    class="secondary"
+    id="closeStudentsBtn"
+  >
+    CLOSE
+  </button>
+
+</div>
   <button id="adminLogoutBtn" class="secondary">LOGOUT</button>
 
 </section>
