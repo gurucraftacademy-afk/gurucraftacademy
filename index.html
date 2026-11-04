@@ -278,7 +278,73 @@ function showRegisterForm() {
 
 $("showRegister").onclick = showRegisterForm;
 $("showLogin").onclick = showLoginForm;
+let allStudents = [];
 
+async function openStudentManagementPanel() {
+  $("studentManagementPanel").classList.remove("hidden");
+  $("studentsList").textContent = "Loading students...";
+
+  try {
+    const snapshot = await getDocs(collection(db, "students"));
+
+    allStudents = [];
+
+    snapshot.forEach((studentDoc) => {
+      const student = studentDoc.data();
+
+      if (student.role === "student") {
+        allStudents.push(student);
+      }
+    });
+
+    renderStudents();
+  } catch (error) {
+    $("studentsList").textContent = "Error: " + error.message;
+  }
+}
+
+function renderStudents() {
+  const search = $("studentSearch").value.toLowerCase().trim();
+  const list = $("studentsList");
+
+  list.replaceChildren();
+
+  const filtered = allStudents.filter((student) =>
+    (student.name || "").toLowerCase().includes(search) ||
+    (student.email || "").toLowerCase().includes(search)
+  );
+
+  if (filtered.length === 0) {
+    list.textContent = "No students found.";
+    return;
+  }
+
+  filtered.forEach((student) => {
+    const item = document.createElement("div");
+    item.className = "tile";
+
+    const name = document.createElement("strong");
+    name.textContent = student.name || "Unnamed Student";
+
+    const details = document.createElement("small");
+    details.textContent =
+      (student.email || "") + " | " + (student.class || "");
+
+    item.appendChild(name);
+    item.appendChild(document.createElement("br"));
+    item.appendChild(details);
+
+    list.appendChild(item);
+  });
+}
+
+$("manageStudentsTile").onclick = openStudentManagementPanel;
+
+$("studentSearch").oninput = renderStudents;
+
+$("closeStudentsBtn").onclick = () => {
+  $("studentManagementPanel").classList.add("hidden");
+};
 $("registerBtn").onclick = async () => {
  const name = $("studentName").value.trim();
  const email = $("registerEmail").value.trim();
