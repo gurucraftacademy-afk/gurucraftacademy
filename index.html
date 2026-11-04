@@ -436,7 +436,73 @@ async function loadCourses() {
     list.textContent = "Error: " + error.message;
   }
 }
+// STUDENT MY COURSES
+async function loadStudentCourses() {
+  const list = $("#myCoursesList");
+  list.textContent = "Loading courses...";
 
+  try {
+    const user = auth.currentUser;
+
+    if (!user) {
+      list.textContent = "Please log in again.";
+      return;
+    }
+
+    const profile = await getDoc(doc(db, "students", user.uid));
+
+    if (!profile.exists()) {
+      list.textContent = "Student profile not found.";
+      return;
+    }
+
+    const studentClass = profile.data().class;
+    const snapshot = await getDocs(collection(db, "courses"));
+
+    list.replaceChildren();
+    let found = false;
+
+    snapshot.forEach((courseDoc) => {
+      const course = courseDoc.data();
+
+      if (course.class === studentClass) {
+        found = true;
+
+        const item = document.createElement("div");
+        item.className = "tile";
+
+        const title = document.createElement("strong");
+        title.textContent = course.name || "Untitled Course";
+
+        const details = document.createElement("small");
+        details.textContent =
+          (course.class || "") + " | " + (course.subject || "");
+
+        item.appendChild(title);
+        item.appendChild(document.createElement("br"));
+        item.appendChild(details);
+
+        list.appendChild(item);
+      }
+    });
+
+    if (!found) {
+      list.textContent = "No courses available for your class yet.";
+    }
+
+  } catch (error) {
+    list.textContent = "Unable to load courses: " + error.message;
+  }
+}
+
+$("#myCoursesTile").onclick = async () => {
+  $("#myCoursesPanel").classList.remove("hidden");
+  await loadStudentCourses();
+};
+
+$("#closeMyCoursesBtn").onclick = () => {
+  $("#myCoursesPanel").classList.add("hidden");
+};
 $("manageCoursesTile").onclick = async () => {
   $("courseManagementPanel").classList.remove("hidden");
   await loadCourses();
